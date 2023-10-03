@@ -1,10 +1,22 @@
+import { useContext } from "react";
 import NextLink from "next/link"
+import { useRouter } from "next/router";
 import { AppBar, Link, Toolbar, Typography, Box, Button, IconButton, Badge } from '@mui/material';
 import SearchRounded from "@mui/icons-material/SearchRounded";
 import { ShoppingCartRounded } from "@mui/icons-material";
+import { UIContext } from "@/context";
 
 
 export const Navbar = () => {
+
+    const { toggleSideMenu } = useContext( UIContext )
+
+    const { asPath } = useRouter()
+    const activeMen = asPath.includes('/men')
+    const activeWomen = asPath.includes('/women')
+    const activeKid = asPath.includes('/kids')
+    
+
     return (
         <AppBar>
             <Toolbar>
@@ -17,13 +29,13 @@ export const Navbar = () => {
 
                 <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
                     <Link component={ NextLink } href='/category/men' passHref>
-                        <Button>Men</Button>
+                        <Button color={ activeMen ? 'primary' : 'info' }>Men</Button>
                     </Link>
                     <Link component={ NextLink } href='/category/women' passHref>
-                        <Button>Women</Button>
+                        <Button color={ activeWomen ? 'primary' : 'info' }>Women</Button>
                     </Link>
                     <Link component={ NextLink } href='/category/kids' passHref>
-                        <Button>Kids</Button>
+                        <Button color={ activeKid ? 'primary' : 'info' }>Kids</Button>
                     </Link>
                 </Box>
 
@@ -41,7 +53,7 @@ export const Navbar = () => {
                     </IconButton>
                 </Link>
 
-                <Button>
+                <Button onClick={ toggleSideMenu }>
                     Menu
                 </Button>
 

@@ -1,6 +1,8 @@
 import NextLink from "next/link"
 import { Box, Grid, Typography, TextField, Button, Link, IconButton } from "@mui/material"
+import StorefrontRoundedIcon from '@mui/icons-material/StorefrontRounded';
 import { AuthLayout } from "@/components"
+import Image from "next/image";
 
 
 const RegisterPage = () => {
@@ -9,11 +11,11 @@ const RegisterPage = () => {
             <Box sx={{ width: 350, padding: '10px 20px' }}>
                 <Grid container spacing={2}>
                     
-                    <Grid item xs={12}>
+                    <Grid item xs={12} display='flex' justifyContent='space-evenly'>
                         <Typography variant="h1" component='h1'>Register</Typography>
-                        <IconButton>
-                            
-                        </IconButton>
+                        <Link component={ NextLink } href='/' passHref>
+                            <Image src="/favicon.ico" alt="logo vercel" width={40} height={40} />
+                        </Link>
                     </Grid>
 
                     <Grid item xs={12}>

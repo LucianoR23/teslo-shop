@@ -18,7 +18,8 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "react-slideshow-image": "^4.2.1"
+    "react-slideshow-image": "^4.2.1",
+    "swr": "^2.2.4"
   },
   "devDependencies": {
     "@types/node": "latest",
