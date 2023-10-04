@@ -30,8 +30,15 @@ const searchProducts = async(req: NextApiRequest, res: NextApiResponse<Data>) =>
     q = q.toString().toLowerCase()
 
     await db.connect()
+    // const products = await Product.find({
+    //     $text: { $search: q }
+    // }).select('title images price inStock slug -_id').lean()
+
     const products = await Product.find({
-        $text: { $search: q }
+        $or: [
+            { title: { $regex: new RegExp(q, 'i') } },
+            { tags: { $regex: new RegExp(q, 'i') } }
+        ]
     }).select('title images price inStock slug -_id').lean()
     
     await db.disconnect()

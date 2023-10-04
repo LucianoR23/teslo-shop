@@ -11,7 +11,6 @@ const KidsPage = () => {
         <ShopLayout title="TesloShop - Kids" pageDescription="All products for kids">
             <Typography variant="h1" component='h1' >Shop</Typography>
             <Typography variant="h2" sx={{ mb: 1 }} >Kids</Typography>
-            <ProductList products={ products } />
             {
                 isLoading
                 ? <FullScreenLoading />

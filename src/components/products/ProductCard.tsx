@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import NextLink from 'next/link'
-import { Grid, Card, CardActionArea, CardMedia, Box, Typography, Link, Skeleton } from '@mui/material'
+import { Grid, Card, CardActionArea, CardMedia, Box, Typography, Link, Skeleton, Chip } from '@mui/material'
 import { IProduct } from '@/interfaces'
 
 
@@ -23,6 +23,9 @@ export const ProductCard = ({ product }: Props) => {
             <Card>
                     <Link component={ NextLink } href={`/product/${ product.slug }`} passHref prefetch={ false }>
                         <CardActionArea>
+                            {
+                                (product.inStock === 0) && (<Chip color='primary' label="Out of stock" sx={{ position: 'absolute', zIndex: 99, left: 5, top: 5 }} />)
+                            }
                             <CardMedia className='fadeIn' component='img' image={ productImg } alt={ product.title } onLoad={ () => setIsImageLoaded(true) } />
                         </CardActionArea>
                     </Link>

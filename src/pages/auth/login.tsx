@@ -33,7 +33,7 @@ const LoginPage = () => {
 
                     <Grid item xs={12} display='flex' justifyContent='end'>
                         <Link underline="always" component={ NextLink } href='/auth/register' passHref>
-                            Don't have an account? Register
+                            {"Don't have an account? Register"}
                         </Link>
                     </Grid>
 
