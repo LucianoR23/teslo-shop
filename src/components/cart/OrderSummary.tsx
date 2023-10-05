@@ -1,17 +1,12 @@
 import { useContext } from 'react';
 import { Divider, Grid, Typography } from "@mui/material"
 import { CartContext } from "@/context";
+import { currency } from '@/utils';
 
 
 export const OrderSummary = () => {
 
-    const { cart } = useContext(CartContext)
-
-    const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0)
-    const subtotalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-
-    const taxes = subtotalPrice * 0.1
-    const totalOrder = taxes + subtotalPrice
+    const { totalPrice, totalQuantity, subtotalPrice, taxes } = useContext(CartContext)
 
 
     return (
@@ -21,28 +16,28 @@ export const OrderSummary = () => {
                 <Typography>Products qty.</Typography>
             </Grid>
             <Grid item xs={6} display='flex' justifyContent='end'>
-                <Typography>{totalQuantity}</Typography>
+                <Typography>{totalQuantity} { totalQuantity > 1 ? 'items' : 'item' }</Typography>
             </Grid>
 
             <Grid item xs={6}>
                 <Typography>Subtotal:</Typography>
             </Grid>
             <Grid item xs={6} display='flex' justifyContent='end'>
-                <Typography>${subtotalPrice}</Typography>
+                <Typography>{currency.formatUSA(subtotalPrice)}</Typography>
             </Grid>
 
             <Grid item xs={6}>
-                <Typography>Taxes (10%)</Typography>
+                <Typography>Taxes ({ Number(process.env.NEXT_PUBLIC_TAX_RATE)*100 }%)</Typography>
             </Grid>
             <Grid item xs={6} display='flex' justifyContent='end'>
-                <Typography>${taxes}</Typography>
+                <Typography>{currency.formatUSA(taxes)}</Typography>
             </Grid>
 
             <Grid item xs={6} sx={{ mt: 2 }}>
                 <Typography variant="subtitle1">Total:</Typography>
             </Grid>
             <Grid item xs={6} display='flex' justifyContent='end' sx={{ mt: 2 }}>
-                <Typography variant="subtitle1">${totalOrder}</Typography>
+                <Typography variant="subtitle1">{currency.formatUSA(totalPrice)}</Typography>
             </Grid>
 
         </Grid>

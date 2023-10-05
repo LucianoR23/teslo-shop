@@ -5,11 +5,19 @@ import { ICartProduct } from '@/interfaces';
 
 
 export interface CartState {
-    cart: ICartProduct[]
+    cart: ICartProduct[];
+    totalQuantity: number;
+    subtotalPrice: number;
+    taxes: number;
+    totalPrice: number;
 }
 
 const CART_INITIAL_STATE: CartState = {
     cart: [],
+    totalQuantity: 0,
+    subtotalPrice: 0,
+    taxes: 0,
+    totalPrice: 0,
 }
 
 interface Props {
@@ -36,6 +44,23 @@ export const CartProvider = ({ children }: Props) => {
         if(state.cart.length === 0) return
         Cookie.set('cart', JSON.stringify( state.cart ))
     }, [state.cart])
+
+    useEffect(() => {
+        const totalQuantity = state.cart.reduce((total, item) => total + item.quantity, 0)
+        const subtotalPrice = state.cart.reduce((total, item) => total + item.price * item.quantity, 0)
+        const taxes = subtotalPrice * Number(process.env.NEXT_PUBLIC_TAX_RATE || 0)
+        const totalPrice = taxes + subtotalPrice
+
+        const orderSummary = {
+            totalQuantity,
+            subtotalPrice,
+            taxes,
+            totalPrice
+        }
+        
+        dispatch({ type: 'Cart - Update order summary', payload: orderSummary })
+    }, [state.cart])
+
     
 
     const addProductCart = ( product: ICartProduct ) => {
@@ -60,9 +85,12 @@ export const CartProvider = ({ children }: Props) => {
     const updateProductCart = ( product: ICartProduct ) => {
         dispatch({ type: 'Cart - Change cart quantity', payload: product })
     }
+    const removeCartProduct = ( product: ICartProduct ) => {
+        dispatch({ type: 'Cart - Remove product in cart', payload: product })
+    }
 
     return (
-        <CartContext.Provider value={{ ...state, addProductCart, updateProductCart }}>
+        <CartContext.Provider value={{ ...state, addProductCart, updateProductCart, removeCartProduct }}>
             { children }
         </CartContext.Provider>
     )
