@@ -25,7 +25,7 @@ const ProductPage = ({ product }: Props) => {
         quantity: 1,
     })
 
-    const { addProductCart, cart } = useContext( CartContext )
+    const { addProductCart } = useContext( CartContext )
     const router = useRouter()
 
     const onSelectedSize = ( size: ISize ) => {
@@ -89,29 +89,6 @@ const ProductPage = ({ product }: Props) => {
         </ShopLayout>
     )
 }
-
-
-// export const getServerSideProps: GetServerSideProps = async({ params }) => {
-//     const { slug } = params as { slug: string }
-
-//     const product = await dbProducts.getProductSlug( slug )
-
-//     if( !product ){
-//         return {
-//             redirect: {
-//                 destination: '/',
-//                 permanent: false
-//             }
-//         }
-//     }
-
-//     return {
-//         props: {
-//             product
-//         }
-//     }
-// }
-
 
 
 export const getStaticPaths: GetStaticPaths = async (ctx) => {

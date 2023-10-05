@@ -4,13 +4,15 @@ import { useRouter } from "next/router";
 import { AppBar, Link, Toolbar, Typography, Box, Button, IconButton, Badge, Input, InputAdornment } from '@mui/material';
 import SearchRounded from "@mui/icons-material/SearchRounded";
 import ShoppingCartRounded from "@mui/icons-material/ShoppingCartRounded";
-import { UIContext } from "@/context";
+import { CartContext, UIContext } from "@/context";
 import ClearRounded from "@mui/icons-material/ClearRounded";
 
 
 export const Navbar = () => {
 
     const { toggleSideMenu } = useContext( UIContext )
+    const { cart } = useContext( CartContext )
+    const totalQuantity = cart.reduce((total, item) => total + item.quantity, 0)
 
     const { asPath, push } = useRouter()
     const activeMen = asPath.includes('/men')
@@ -91,7 +93,7 @@ export const Navbar = () => {
 
                 <Link component={ NextLink } href='/cart' passHref>
                     <IconButton>
-                        <Badge badgeContent={ 2 } color="secondary">
+                        <Badge badgeContent={ totalQuantity > 9 ? `+9` : totalQuantity } color="secondary">
                             <ShoppingCartRounded />
                         </Badge>
                     </IconButton>
