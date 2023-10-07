@@ -11,8 +11,8 @@ type Data =
 export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
 
     switch ( req.method ) {
-        case 'POST':
-            return loginUser( req, res )
+        case 'GET':
+            return checkJWT( req, res )
     
         default:
             res.status(400).json({ message: 'Method does not exist' })
@@ -21,31 +21,34 @@ export default function handler(req: NextApiRequest, res: NextApiResponse<Data>)
     res.status(200).json({ message: 'Example' })
 }
 
-const loginUser = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
+const checkJWT = async(req: NextApiRequest, res: NextApiResponse<Data>) => {
 
-    const { email = '', password = '' } = req.body
+    const { token = '' } = req.cookies
+
+    let userId = ''
+
+    try {
+        userId = await jwt.isValidToken( token )
+    } catch (error) {
+        return res.status(401).json({ message: 'Token is not valid' })
+    }
 
     await db.connect()
-    const user = await User.findOne({ email })
+    const user = await User.findById( userId ).lean()
     await db.disconnect()
 
     if( !user ){
-        return res.status(400).json({ message: 'Email is not valid' })
+        return res.status(400).json({ message: 'User is not valid' })
     }
 
-    if( !bcrypt.compareSync(password, user.password!) ){
-        return res.status(400).json({ message: 'Password is not valid' })
-    }
+    const { name, role, email, _id } = user
 
-    const { name, role, _id } = user
-
-    const token = jwt.signToken( _id, email )
 
     return res.status(200).json({
             user: {
                 email, role, name
             },
-            token
+            token: jwt.signToken( _id, email )
     })
 
 }

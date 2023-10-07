@@ -1,3 +1,6 @@
+export * from './auth/AuthContext'
+export * from './auth/AuthProvider'
+export * from './auth/authReducer'
 export * from './cart/CartContext'
 export * from './cart/CartProvider'
 export * from './cart/cartReducer'
