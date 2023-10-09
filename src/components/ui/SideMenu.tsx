@@ -2,12 +2,13 @@ import { useContext, useState } from "react"
 import { useRouter } from "next/router"
 import { Box, Divider, Drawer, IconButton, Input, InputAdornment, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from "@mui/material"
 import { AccountCircleOutlined, AdminPanelSettings, CategoryOutlined, ConfirmationNumberOutlined, EscalatorWarningOutlined, FemaleOutlined, LoginOutlined, MaleOutlined, SearchOutlined, VpnKeyOutlined } from "@mui/icons-material"
-import { UIContext } from "@/context"
+import { AuthContext, UIContext } from "@/context"
 
 
 export const SideMenu = () => {
 
     const { isMenuOpen, toggleSideMenu } = useContext( UIContext )
+    const { isLoggedIn, user, logoutUser } = useContext(AuthContext)
     const router = useRouter()
 
     const [searchTerm, setSearchTerm] = useState('')
@@ -54,14 +55,14 @@ export const SideMenu = () => {
                         />
                     </ListItem>
 
-                    <ListItemButton>
+                    <ListItemButton sx={{ display: !isLoggedIn ? 'none' : 'flex' }}>
                         <ListItemIcon>
                             <AccountCircleOutlined/>
                         </ListItemIcon>
                         <ListItemText primary={'Perfil'} />
                     </ListItemButton>
 
-                    <ListItemButton>
+                    <ListItemButton sx={{ display: !isLoggedIn ? 'none' : 'flex' }}>
                         <ListItemIcon>
                             <ConfirmationNumberOutlined/>
                         </ListItemIcon>
@@ -91,14 +92,14 @@ export const SideMenu = () => {
                     </ListItemButton>
 
 
-                    <ListItemButton onClick={ () => navigateTo('/auth/login') }>
+                    <ListItemButton sx={{ display: isLoggedIn ? 'none' : 'flex' }} onClick={ () => navigateTo(`/auth/login?p=${ router.asPath }`) }>
                         <ListItemIcon>
                             <VpnKeyOutlined/>
                         </ListItemIcon>
                         <ListItemText primary={'Ingresar'} />
                     </ListItemButton>
 
-                    <ListItemButton>
+                    <ListItemButton onClick={ logoutUser } sx={{ display: !isLoggedIn ? 'none' : 'flex' }}>
                         <ListItemIcon>
                             <LoginOutlined/>
                         </ListItemIcon>
@@ -107,28 +108,31 @@ export const SideMenu = () => {
 
 
                     {/* Admin */}
-                    <Divider />
-                    <ListSubheader>Admin Panel</ListSubheader>
+                    <Box display={ isLoggedIn && user?.role === 'admin' ? 'block' : 'none' }>
 
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <CategoryOutlined/>
-                        </ListItemIcon>
-                        <ListItemText primary={'Productos'} />
-                    </ListItemButton>
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <ConfirmationNumberOutlined/>
-                        </ListItemIcon>
-                        <ListItemText primary={'Ordenes'} />
-                    </ListItemButton>
+                        <Divider />
+                        <ListSubheader>Admin Panel</ListSubheader>
 
-                    <ListItemButton>
-                        <ListItemIcon>
-                            <AdminPanelSettings/>
-                        </ListItemIcon>
-                        <ListItemText primary={'Usuarios'} />
-                    </ListItemButton>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <CategoryOutlined/>
+                            </ListItemIcon>
+                            <ListItemText primary={'Productos'} />
+                        </ListItemButton>
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <ConfirmationNumberOutlined/>
+                            </ListItemIcon>
+                            <ListItemText primary={'Ordenes'} />
+                        </ListItemButton>
+
+                        <ListItemButton>
+                            <ListItemIcon>
+                                <AdminPanelSettings/>
+                            </ListItemIcon>
+                            <ListItemText primary={'Usuarios'} />
+                        </ListItemButton>
+                    </Box>
                 </List>
             </Box>
         </Drawer>

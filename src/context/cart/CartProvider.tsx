@@ -2,22 +2,38 @@ import { ReactNode, useEffect, useReducer } from 'react';
 import Cookie from 'js-cookie'
 import { CartContext, cartReducer } from '..';
 import { ICartProduct } from '@/interfaces';
+import { useRouter } from 'next/router';
 
 
 export interface CartState {
+    isLoaded: boolean
     cart: ICartProduct[];
     totalQuantity: number;
     subtotalPrice: number;
     taxes: number;
     totalPrice: number;
+    shippingAddress?: ShippingAddress
+}
+
+export interface ShippingAddress {
+        firstName: string
+        lastName: string
+        address: string
+        address2?: string
+        zip: string
+        city: string
+        country: string
+        phone: string
 }
 
 const CART_INITIAL_STATE: CartState = {
+    isLoaded: false,
     cart: [],
     totalQuantity: 0,
     subtotalPrice: 0,
     taxes: 0,
     totalPrice: 0,
+    shippingAddress: undefined
 }
 
 interface Props {
@@ -27,6 +43,7 @@ interface Props {
 export const CartProvider = ({ children }: Props) => {
 
     const [state, dispatch] = useReducer(cartReducer, CART_INITIAL_STATE)
+    const router = useRouter()
 
     useEffect(() => {
         try {
@@ -37,8 +54,26 @@ export const CartProvider = ({ children }: Props) => {
             dispatch({ type: 'Cart - LoadCart cookies', payload: [] })
         }
 
-    
     }, [])
+
+    useEffect(() => {
+
+        if( Cookie.get('firstName') ){
+            const addressInCookies = {
+                firstName: Cookie.get('firstName') || '',
+                lastName: Cookie.get('lastName') || '',
+                address: Cookie.get('address') || '',
+                address2: Cookie.get('address2') || '',
+                zip: Cookie.get('zip') || '',
+                city: Cookie.get('city') || '',
+                country: Cookie.get('country') || '',
+                phone: Cookie.get('phone') || '',
+            }
+            dispatch({ type: 'Cart - Load address cookies', payload: addressInCookies })
+        }
+
+    }, [])
+    
     
     useEffect(() => {
         if(state.cart.length === 0) return
@@ -89,8 +124,20 @@ export const CartProvider = ({ children }: Props) => {
         dispatch({ type: 'Cart - Remove product in cart', payload: product })
     }
 
+    const updateAddress = ( address: ShippingAddress ) => {
+        Cookie.set('firstName', address.firstName)
+        Cookie.set('lastName', address.lastName)
+        Cookie.set('address', address.address)
+        Cookie.set('address2', address.address2 || '')
+        Cookie.set('zip', address.zip)
+        Cookie.set('city', address.city)
+        Cookie.set('country', address.country)
+        Cookie.set('phone', address.phone)
+        dispatch({ type: 'Cart - Update address', payload: address })
+    }
+
     return (
-        <CartContext.Provider value={{ ...state, addProductCart, updateProductCart, removeCartProduct }}>
+        <CartContext.Provider value={{ ...state, addProductCart, updateProductCart, removeCartProduct, updateAddress }}>
             { children }
         </CartContext.Provider>
     )

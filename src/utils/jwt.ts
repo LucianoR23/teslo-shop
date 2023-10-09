@@ -16,6 +16,10 @@ export const isValidToken = ( token: string ): Promise<string> => {
         throw new Error("There is no JWT seed - check env");
     }
 
+    if( token.length <= 10 ){
+        return Promise.reject('JWT no es valido')
+    }
+
     return new Promise( (resolve, reject) => {
 
         try {

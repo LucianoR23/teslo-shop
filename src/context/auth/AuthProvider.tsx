@@ -1,9 +1,11 @@
 import { ReactNode, useEffect, useReducer } from 'react';
+import { useRouter } from 'next/router';
+import { useSession, signIn, signOut } from "next-auth/react"
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import { AuthContext, authReducer } from "../"
 import { IUser } from '@/interfaces';
 import { tesloApi } from '@/apis';
-import Cookies from 'js-cookie';
-import axios from 'axios';
 
 
 export interface AuthState {
@@ -23,20 +25,30 @@ interface Props {
 export const AuthProvider = ({ children }: Props) => {
 
     const [state, dispatch] = useReducer(authReducer, AUTH_INITIAL_STATE)
+    const router = useRouter()
+    const { data, status } = useSession()
 
     useEffect(() => {
-        checkToken()
-    }, [])
+        if( status === 'authenticated' ){
+            console.log({user: data.user})
+            //TODO dispatch({ type: 'AUTH - Login', payload: data.user as IUser })
+        }
+    }, [status, data])
+    
+
+    // useEffect(() => {
+    //     checkToken()
+    // }, [])
 
     const checkToken = async() => {
 
+        if( !Cookies.get('token') ){ return }
+
         try {
-            if( Cookies.get('token') ){
                 const { data } = await tesloApi.get('/users/validate-token')
                 const { token, user } = data
                 Cookies.set('token', token)
                 dispatch({ type: 'AUTH - Login', payload: user })
-            }
         } catch (error) {
             Cookies.remove('token')
         }
@@ -85,11 +97,24 @@ export const AuthProvider = ({ children }: Props) => {
                 message: 'Could not create user - Try again please'
             }
         }
+    }
 
+    const logoutUser = () => {
+        Cookies.remove('token')
+        Cookies.remove('cart')
+        Cookies.remove('firstName')
+        Cookies.remove('lastName')
+        Cookies.remove('address')
+        Cookies.remove('address2')
+        Cookies.remove('zip')
+        Cookies.remove('city')
+        Cookies.remove('country')
+        Cookies.remove('phone')
+        router.reload()
     }
 
     return (
-        <AuthContext.Provider value={{ ...state, loginUser, registerUser }}>
+        <AuthContext.Provider value={{ ...state, loginUser, registerUser, logoutUser }}>
             { children }
         </AuthContext.Provider>
     )

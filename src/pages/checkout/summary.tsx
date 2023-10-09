@@ -1,9 +1,24 @@
+import { useContext } from 'react';
 import NextLink from "next/link"
 import { Box, Button, Card, CardContent, Divider, Grid, Link, Typography } from "@mui/material"
+import { CartContext } from "@/context";
 import { CartList, OrderSummary, ShopLayout } from "@/components"
+import { useRouter } from 'next/router';
+import { countries } from '@/utils';
 
 
 const SummaryPage = () => {
+
+    const { shippingAddress, totalQuantity } = useContext( CartContext )
+    const router = useRouter()
+
+    if( !shippingAddress ){
+        return (<></>)
+    }
+
+    const { address, city, country: code, firstName, lastName, phone, zip, address2 } = shippingAddress
+    const country = countries.find( ctry => ctry.code === code )
+
     return (
         <ShopLayout title="Order summary" pageDescription={"Order Summary"}>
 
@@ -18,7 +33,7 @@ const SummaryPage = () => {
                 <Grid item xs={12} sm={5}>
                     <Card className="summary-card">
                         <CardContent>
-                            <Typography variant="h2">Summary (3 items)</Typography>
+                            <Typography variant="h2">Summary ({totalQuantity} { totalQuantity === 1 ? 'item' : 'items' })</Typography>
                             <Divider sx={{ my: 1 }} />
 
                             <Box display='flex' justifyContent='space-between' alignItems='center'>
@@ -28,11 +43,11 @@ const SummaryPage = () => {
                                 </Link>
                             </Box>
 
-                            <Typography>Luciano Rodriguez</Typography>
-                            <Typography>25 de mayo 556</Typography>
-                            <Typography>Corrientes, 3400</Typography>
-                            <Typography>Argentina</Typography>
-                            <Typography>+54 9 3794123456</Typography>
+                            <Typography>{ `${firstName} ${lastName}` }</Typography>
+                            <Typography>{ `${ address }${ address2 ? ',' : '' } ${ address2 }` }</Typography>
+                            <Typography>{ `${ city } - ${ zip }` }</Typography>
+                            <Typography>{ `${ country?.name }` }</Typography>
+                            <Typography>{ `${ phone }` }</Typography>
 
                             <Divider sx={{ my: 1 }} />
                             <Box display='flex' justifyContent='end' marginBottom={1}>
