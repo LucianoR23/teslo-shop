@@ -12,7 +12,7 @@ const CartPage = () => {
 
     useEffect(() => {
         if( isLoaded && cart.length === 0 ){
-            router.replace('cart/empty')
+            router.replace('/cart/empty')
         }
 
     }, [isLoaded, cart, router])

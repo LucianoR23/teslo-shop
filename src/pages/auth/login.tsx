@@ -1,14 +1,16 @@
-import { useContext, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { GetServerSideProps } from 'next'
+import { useRouter } from 'next/router';
 import NextLink from "next/link"
 import Image from "next/image"
-import { Box, Button, Chip, Grid, Link, TextField, Typography } from "@mui/material"
+import { getSession, signIn, getProviders } from 'next-auth/react';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import GoogleIcon from '@mui/icons-material/Google';
+import { Box, Button, Chip, Divider, Grid, Link, TextField, Typography } from "@mui/material"
 import { ErrorRounded } from "@mui/icons-material"
 import { useForm } from "react-hook-form"
-import { AuthContext } from '@/context';
 import { AuthLayout } from "@/components"
 import { validations } from "@/utils"
-import { tesloApi } from "@/apis"
-import { useRouter } from 'next/router';
 
 
 type FormData = {
@@ -19,26 +21,41 @@ type FormData = {
 const LoginPage = () => {
     
     const router = useRouter()
-    const { loginUser } = useContext(AuthContext)
     const { register, handleSubmit, formState: { errors }, } = useForm<FormData>()
     const [showError, setShowError] = useState(false)
+
+    const [providers, setProviders] = useState<any>({})
+
+    useEffect(() => {
+        getProviders().then( prov => {
+            setProviders( prov )
+        } )
+    }, [])
+    
+
     
     const onLoginUser = async( { email, password }: FormData ) => {
 
         setShowError(false)
 
-        const isValidLogin = await loginUser( email, password )
-        if( !isValidLogin ){
-            setShowError(true)
-            setTimeout(() => {
-                setShowError(false)
-            }, 3000);
-            return
-        }
+        await signIn('credentials', { email, password })
 
-        const destination = router.query.p?.toString() || '/'
-        router.replace(destination)
+        
+
+
+        // const isValidLogin = await loginUser( email, password )
+        // if( !isValidLogin ){
+        //     setShowError(true)
+        //     setTimeout(() => {
+        //         setShowError(false)
+        //     }, 3000);
+        //     return
+        // }
+
+        // const destination = router.query.p?.toString() || '/'
+        // router.replace(destination)
     }
+
 
     return (
         <AuthLayout title={"Sign in"}>
@@ -94,11 +111,60 @@ const LoginPage = () => {
                             </Link>
                         </Grid>
 
+                            <Divider sx={{ width: '100%', my: 2 }} />
+                        <Grid item xs={12} display='flex' justifyContent='space-evenly'>
+
+                            {
+                                Object.values( providers ).map( (provider: any) => {
+                                    if( provider.id === 'credentials') return (<Box key="credentials" display='none'></Box>)
+
+                                    const icons: { [key: string]: JSX.Element } = {
+                                        'github': <GitHubIcon />,
+                                        'google': <GoogleIcon />,
+                                        // Añade aquí otros iconos según sea necesario
+                                    };
+
+                                    return (
+                                        <Button 
+                                        color='primary'
+                                        size='large'
+                                        key={ provider.id }
+                                        startIcon={ icons[provider.name.toLowerCase()] }
+                                        onClick={() => signIn(provider.id)}
+                                        >
+                                            { provider.name }
+                                        </Button>
+                                    )
+                                })
+                            }
+                        </Grid>
+
                     </Grid>
                 </Box>
             </form>
         </AuthLayout>
     )
+}
+
+
+
+export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
+    const session = await getSession({ req })
+
+    const { p = '/' } = query
+
+    if( session ){
+        return {
+            redirect: {
+                destination: p.toString(),
+                permanent: false
+            }
+        }
+    }
+
+    return {
+        props: { }
+    }
 }
 
 export default LoginPage

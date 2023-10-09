@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { useForm } from "react-hook-form"
@@ -36,11 +36,15 @@ const AddressPage = () => {
 
     const router = useRouter()
     const { updateAddress, cart } = useContext( CartContext )
-    
 
-    // if( cart.length === 0){
+    useEffect(() => {
+        setTimeout(() => {
+            if( cart.length === 0 ){
+                router.push('/cart/empty')
+            }
+        }, 1000);
+    }, [cart, router])
 
-    // }
 
     const { register, handleSubmit, formState: { errors,  }, getValues } = useForm<FormData>({
         defaultValues: getAddressCookies()

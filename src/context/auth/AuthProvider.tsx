@@ -30,8 +30,7 @@ export const AuthProvider = ({ children }: Props) => {
 
     useEffect(() => {
         if( status === 'authenticated' ){
-            console.log({user: data.user})
-            //TODO dispatch({ type: 'AUTH - Login', payload: data.user as IUser })
+            dispatch({ type: 'AUTH - Login', payload: data?.user as IUser })
         }
     }, [status, data])
     
@@ -100,7 +99,6 @@ export const AuthProvider = ({ children }: Props) => {
     }
 
     const logoutUser = () => {
-        Cookies.remove('token')
         Cookies.remove('cart')
         Cookies.remove('firstName')
         Cookies.remove('lastName')
@@ -110,7 +108,8 @@ export const AuthProvider = ({ children }: Props) => {
         Cookies.remove('city')
         Cookies.remove('country')
         Cookies.remove('phone')
-        router.reload()
+        signOut()
+        
     }
 
     return (

@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import GithubProvider from "next-auth/providers/github"
-import { jwt } from '@/utils';
+import GoogleProvider from "next-auth/providers/google";
 import { dbUsers } from "@/database";
 
 export const authOptions: NextAuthOptions = {
@@ -10,6 +10,10 @@ export const authOptions: NextAuthOptions = {
         GithubProvider({
             clientId: process.env.GITHUB_ID || '',
             clientSecret: process.env.GITHUB_SECRET || '',
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID || '',
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || ''
         }),
         Credentials({
             name: 'Custom Login',
@@ -25,6 +29,17 @@ export const authOptions: NextAuthOptions = {
         })
     ],
 
+    pages: {
+        signIn: '/auth/login',
+        newUser: '/auth/register'
+    },
+
+    session: {
+        maxAge: 86400,
+        strategy: 'jwt',
+        updateAge: 3600
+    },
+
     callbacks: {
         async jwt({ token, account, user }){
             if( account ){
@@ -32,7 +47,8 @@ export const authOptions: NextAuthOptions = {
 
                 switch( account.type ){
                     case 'oauth':
-                        // TODO verificar
+                        
+                        token.user = await dbUsers.dbUserOAuth( user?.email || '', user?.name || '' )
                         break
 
                     case 'credentials':
