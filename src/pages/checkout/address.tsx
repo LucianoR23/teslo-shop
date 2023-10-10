@@ -35,15 +35,14 @@ const getAddressCookies = ():FormData => {
 const AddressPage = () => {
 
     const router = useRouter()
-    const { updateAddress, cart } = useContext( CartContext )
+    const { updateAddress } = useContext( CartContext )
 
     useEffect(() => {
-        setTimeout(() => {
-            if( cart.length === 0 ){
-                router.push('/cart/empty')
-            }
-        }, 1000);
-    }, [cart, router])
+        if( !Cookies.get('cart') ){
+            router.replace('/cart/empty')
+        }
+        
+    }, [])
 
 
     const { register, handleSubmit, formState: { errors,  }, getValues } = useForm<FormData>({

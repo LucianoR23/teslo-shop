@@ -13,13 +13,6 @@ const SummaryPage = () => {
     const { shippingAddress, totalQuantity } = useContext( CartContext )
     const router = useRouter()
 
-    useEffect(() => {
-        setTimeout(() => {
-            if( totalQuantity === 0 ){
-                router.push('/cart/empty')
-            }
-        }, 100);
-    }, [router, totalQuantity])
 
     useEffect(() => {
         if( !Cookies.get('address') ){

@@ -76,8 +76,14 @@ export const CartProvider = ({ children }: Props) => {
     
     
     useEffect(() => {
-        if(state.cart.length === 0) return
-        Cookie.set('cart', JSON.stringify( state.cart ))
+        setTimeout(() => {
+            if(state.cart.length === 0){
+                return Cookie.remove('cart')
+            }
+            Cookie.set('cart', JSON.stringify( state.cart ))
+            
+        }, 1000);
+        
     }, [state.cart])
 
     useEffect(() => {
