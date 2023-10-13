@@ -37,17 +37,11 @@ const AddressPage = () => {
     const router = useRouter()
     const { updateAddress } = useContext( CartContext )
 
-    useEffect(() => {
-        if( !Cookies.get('cart') ){
-            router.replace('/cart/empty')
-        }
-        
-    }, [])
 
-
-    const { register, handleSubmit, formState: { errors,  }, getValues } = useForm<FormData>({
+    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
         defaultValues: getAddressCookies()
     })
+    
 
     const onSubmitAddress = ( data: FormData ) => {
 

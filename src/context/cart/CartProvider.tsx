@@ -1,8 +1,9 @@
 import { ReactNode, useEffect, useReducer } from 'react';
 import Cookie from 'js-cookie'
 import { CartContext, cartReducer } from '..';
-import { ICartProduct } from '@/interfaces';
-import { useRouter } from 'next/router';
+import { ICartProduct, IOrder, ShippingAddress } from '@/interfaces';
+import { tesloApi } from '@/apis';
+import axios from 'axios';
 
 
 export interface CartState {
@@ -15,16 +16,7 @@ export interface CartState {
     shippingAddress?: ShippingAddress
 }
 
-export interface ShippingAddress {
-        firstName: string
-        lastName: string
-        address: string
-        address2?: string
-        zip: string
-        city: string
-        country: string
-        phone: string
-}
+
 
 const CART_INITIAL_STATE: CartState = {
     isLoaded: false,
@@ -43,7 +35,6 @@ interface Props {
 export const CartProvider = ({ children }: Props) => {
 
     const [state, dispatch] = useReducer(cartReducer, CART_INITIAL_STATE)
-    const router = useRouter()
 
     useEffect(() => {
         try {
@@ -142,8 +133,54 @@ export const CartProvider = ({ children }: Props) => {
         dispatch({ type: 'Cart - Update address', payload: address })
     }
 
+    const createOrder = async(): Promise<{ hasError: boolean; message: string; }> => {
+
+        if( !state.shippingAddress ){
+            throw new Error('There is no shipping address')
+        }
+
+        const body: IOrder =  {
+            orderItems: state.cart.map( p => ({
+                ...p,
+                size: p.size!
+            }) ),
+            shippingAddress: state.shippingAddress,
+            totalQuantity: state.totalQuantity,
+            subtotalPrice: state.subtotalPrice,
+            taxes: state.taxes,
+            totalPrice: state.totalPrice,
+            isPaid: false,
+        }
+
+        try {
+
+            const { data } = await tesloApi.post<IOrder>('/orders', body)
+            
+            dispatch({ type: 'Cart - Order complete' })
+
+            return {
+                hasError: false,
+                message: data._id!
+            }
+            
+        } catch (error) {
+            console.log(error)
+            if( axios.isAxiosError(error) ){
+                return {
+                    hasError: true,
+                    message: error.response?.data.message,
+                }
+            }
+            return {
+                hasError: true,
+                message: 'Unhandled error, talk to administrator'
+            }
+        }
+
+    }
+
     return (
-        <CartContext.Provider value={{ ...state, addProductCart, updateProductCart, removeCartProduct, updateAddress }}>
+        <CartContext.Provider value={{ ...state, addProductCart, updateProductCart, removeCartProduct, updateAddress, createOrder }}>
             { children }
         </CartContext.Provider>
     )

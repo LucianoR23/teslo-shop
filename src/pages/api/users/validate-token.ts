@@ -8,7 +8,7 @@ type Data =
 | { message: string }
 | { token: string, user: { email: string, name: string, role: string } }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+export default function handlerValidateToken(req: NextApiRequest, res: NextApiResponse<Data>) {
 
     switch ( req.method ) {
         case 'GET':

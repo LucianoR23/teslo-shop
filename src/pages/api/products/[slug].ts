@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 type Data = | { message: string } | IProduct
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+export default function handlerSlug(req: NextApiRequest, res: NextApiResponse<Data>) {
 
     const { slug } = req.query
 

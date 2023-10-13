@@ -5,7 +5,7 @@ import { IProduct } from '@/interfaces'
 
 type Data = { message: string } | IProduct[]
 
-export default function handler(req: NextApiRequest, res: NextApiResponse<Data>) {
+export default function handlerQuery(req: NextApiRequest, res: NextApiResponse<Data>) {
 
     switch ( req.method ) {
         case 'GET':

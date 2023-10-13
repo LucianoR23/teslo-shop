@@ -1,6 +1,7 @@
 import { Slide } from "react-slideshow-image"
 import 'react-slideshow-image/dist/styles.css'
 import styles from './Slideshow.module.css'
+import { Box } from "@mui/material"
 
 interface Props {
     images: string[]
@@ -14,9 +15,9 @@ export const Slideshow = ({ images }: Props) => {
                     const url = `/products/${ img }`
                     return (
                         <div className={ styles['each-slide'] } key={ img }>
-                            <div style={{ backgroundImage: `url(${ url })`, backgroundSize: 'cover' }}>
+                            <Box component='div' style={{ backgroundImage: `url(${ url })`, backgroundSize: 'cover' }}>
 
-                            </div>
+                            </Box>
                         </div>
                     )
                 } )

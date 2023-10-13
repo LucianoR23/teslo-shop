@@ -22,7 +22,6 @@ export const authOptions: NextAuthOptions = {
                 password: { label: 'Password', type: 'password', placeholder: 'Password' },
             },
             async authorize(credentials): Promise<{ id: string; _id: string; email: string; role: string; name: string; } | null>{
-                console.log(credentials)
 
                 return await dbUsers.checkUserEmailPassword( credentials!.email, credentials!.password )
             }
@@ -62,9 +61,13 @@ export const authOptions: NextAuthOptions = {
         async session({ session, token, user }){
 
             session.accessToken = token.accessToken as any
+            session.image = session.user?.image as any
+            session.name = session.user?.name as any
             session.user = token.user as any
+            
 
             return session
+
         }
     }
 }
