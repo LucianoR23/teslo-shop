@@ -1,16 +1,29 @@
+import { useState } from 'react'
 import { GetServerSideProps, NextPage } from 'next'
-import NextLink from "next/link"
+import { useRouter } from 'next/router'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../api/auth/[...nextauth]'
 import CreditScoreRounded from "@mui/icons-material/CreditScoreRounded"
 import CreditCardOffRounded from "@mui/icons-material/CreditCardOffRounded"
-import { Typography, Grid, Card, CardContent, Divider, Box, Button, Link, Chip } from "@mui/material"
+import { Typography, Grid, Card, CardContent, Divider, Box, Button, Chip, CircularProgress } from "@mui/material"
 import { ShopLayout, CartList, OrderSummary } from "@/components"
-import { getSession } from 'next-auth/react'
 import { dbOrders } from '@/database'
 import { IOrder } from '@/interfaces'
 import { countries } from '@/utils'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '../api/auth/[...nextauth]'
+import { PayPalButtons } from '@paypal/react-paypal-js'
+import { tesloApi } from '@/apis'
 
+
+export type OrderResponseBody = {
+    id: string;
+    status:
+        | "CREATED"
+        | "SAVED"
+        | "APPROVED"
+        | "VOIDED"
+        | "COMPLETED"
+        | "PAYER_ACTION_REQUIRED";
+}
 
 interface Props {
     order: IOrder
@@ -18,10 +31,37 @@ interface Props {
 
 const OrderPage: NextPage<Props> = ({ order }) => {
 
+    const router = useRouter()
+    const [isPaying, setIsPaying] = useState(false)
+
     const { address, city, country: code, firstName, lastName, phone, zip, address2 } = order.shippingAddress
     const country = countries.find( ctry => ctry.code === code )
     const { subtotalPrice, taxes, totalPrice, totalQuantity } = order
     const values = { subtotalPrice, taxes, totalPrice, totalQuantity }
+
+    const onOrderCompleted = async( details: OrderResponseBody ) => {
+        if( details.status !== "COMPLETED" ){
+            return alert('There is no payment on PayPal')
+        }
+
+        setIsPaying(true)
+
+        try {
+
+            const { data } = await tesloApi.post(`/orders/pay`, {
+                transactionid: details.id,
+                orderid: order._id
+            })
+
+            router.reload()
+
+        } catch (error) {
+            setIsPaying(false)
+            console.log(error)
+            alert('Error')
+        }
+
+    }
     
 
     return (
@@ -66,17 +106,43 @@ const OrderPage: NextPage<Props> = ({ order }) => {
                             <OrderSummary values={ values } />
                             <Box sx={{ mt: 3 }} display='flex' flexDirection='column'>
                                 {/* todo */}
-                                {
-                                    order.isPaid
-                                        ? (
-                                            <Chip sx={{ my: 2 }} label="Order has already been paid" variant="outlined" color="success" icon={ <CreditScoreRounded /> } />
-                                        )
-                                        : (
-                                            <>
-                                                <h1>Pagar</h1>
-                                            </>
-                                        )
-                                }
+                                <Box display={ isPaying ? 'flex' : 'none' } justifyContent='center' component='div' className='fadeIn'>
+                                    <CircularProgress />
+                                </Box>
+
+                                <Box display={ isPaying ? 'none' : 'flex' } flexDirection='column'>
+                                    {
+                                        order.isPaid
+                                            ? (
+                                                <Chip sx={{ my: 2 }} label="Order has already been paid" variant="outlined" color="success" icon={ <CreditScoreRounded /> } />
+                                            )
+                                            : (
+                                                <>
+                                                    <PayPalButtons
+                                                        createOrder={(data, actions) => {
+                                                            return actions.order.create({
+                                                                purchase_units: [
+                                                                    {
+                                                                        amount: {
+                                                                            value: `${order.totalPrice}`,
+                                                                        },
+                                                                    },
+                                                                ],
+                                                            })
+                                                        }}
+                                                        onApprove={(data, actions) => {
+                                                            return actions.order!.capture().then((details) => {
+                                                                onOrderCompleted(details)
+                                                                // console.log(details)
+                                                                // const name = details.payer.name?.given_name
+                                                            })
+                                                        }}
+                                                    />
+                                                </>
+                                            )
+                                    }
+
+                                </Box>
                                 
                             </Box>
                         </CardContent>
