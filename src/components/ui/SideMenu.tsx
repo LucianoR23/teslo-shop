@@ -113,7 +113,7 @@ export const SideMenu = () => {
 
 
                     {/* Admin */}
-                    <Box display={ isLoggedIn && user?.role === 'admin' || 'super-user' ? 'block' : 'none' }>
+                    <Box display={ isLoggedIn && user?.role === ('admin' || 'super-user') ? 'block' : 'none' }>
 
                         <Divider />
                         <ListSubheader>Admin Panel</ListSubheader>
@@ -124,7 +124,7 @@ export const SideMenu = () => {
                             </ListItemIcon>
                             <ListItemText primary={'Dashboard'} />
                         </ListItemButton>
-                        <ListItemButton>
+                        <ListItemButton onClick={ () => navigateTo('/admin/products') }>
                             <ListItemIcon>
                                 <CategoryOutlined/>
                             </ListItemIcon>
