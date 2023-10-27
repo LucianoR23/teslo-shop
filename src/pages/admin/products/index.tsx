@@ -2,9 +2,9 @@ import { AdminLayout } from "@/components"
 import { IProduct, IUser } from "@/interfaces";
 import { currency } from "@/utils";
 import { CategoryRounded, ConfirmationNumberRounded } from "@mui/icons-material"
-import { CardMedia, Chip, Grid } from "@mui/material"
+import { CardMedia, Chip, Grid, Link } from "@mui/material"
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
-import Link from "next/link";
+import NextLink from "next/link";
 import useSWR from "swr";
 
 
@@ -16,13 +16,26 @@ const columns: GridColDef[] = [
         headerClassName: 'border-line',
         renderCell: ({ row }: GridRenderCellParams ) => {
             return (
-                <Link href={ `/product/${ row.slug }` } prefetch={ false } target="_blank">
+                <NextLink href={ `/product/${ row.slug }` } prefetch={ false } target="_blank">
                     <CardMedia component='img' className="fadeIn" image={ `/products/${ row.img }` } alt={ row.title } />
+                </NextLink>
+            )
+        }
+    },
+    { 
+        field: 'title',
+        headerName: 'Title',
+        width: 250,
+        cellClassName: 'border-line',
+        headerClassName: 'border-line',
+        renderCell: ({ row }: GridRenderCellParams ) => {
+            return (
+                <Link component={ NextLink } href={ `/admin/products/${ row.slug }` } underline="always">
+                    { row.title }
                 </Link>
             )
         }
     },
-    { field: 'title', headerName: 'Title', width: 250, cellClassName: 'border-line', headerClassName: 'border-line' },
     { field: 'gender', headerName: 'Gender', align: 'center', headerAlign: 'center', cellClassName: 'border-line', headerClassName: 'border-line' },
     { field: 'type', headerName: 'Type', align: 'center', headerAlign: 'center', cellClassName: 'border-line', headerClassName: 'border-line' },
     { field: 'inStock', headerName: 'Stock', align: 'center', headerAlign: 'center', cellClassName: 'border-line', headerClassName: 'border-line' },
