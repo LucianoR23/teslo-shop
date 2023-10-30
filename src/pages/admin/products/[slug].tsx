@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { GetServerSideProps } from "next";
 import { useForm } from "react-hook-form";
 import { DriveFileRenameOutline, SaveOutlined, UploadOutlined } from "@mui/icons-material";
@@ -31,9 +31,20 @@ interface Props {
 
 const ProductAdminPage: FC<Props> = ({ product }) => {
 
-    const { register, handleSubmit, formState:{ errors }, getValues, setValue } = useForm<FormData>({
+    const { register, handleSubmit, formState:{ errors }, getValues, setValue, watch } = useForm<FormData>({
         defaultValues: product
     })
+
+    useEffect(() => {
+        const subscription = watch(( value, { name, type } ) => {
+            if( name === 'title' ){
+                const newSlug = value.title?.trim().replaceAll(' ', '_').replaceAll("'", "").replaceAll('"', '').toLocaleLowerCase() || ''
+                setValue('slug', newSlug)
+            }
+        })
+
+        return () => subscription.unsubscribe()
+    }, [watch, setValue])
 
     const onChangeSize = ( size: string ) => {
         const  currentSize = getValues('sizes')
@@ -91,9 +102,8 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
                             label="Description"
                             variant="filled"
                             fullWidth 
-                            multiline
-                            minRows={ 5 }
-                            maxRows={ 10 }
+                            multiline={ true }
+                            rows={ 8 }
                             sx={{ mb: 1 }}
                             { ...register('description', {
                                 required: 'This field is required'
