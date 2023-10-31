@@ -2,7 +2,7 @@ import mongoose, { Schema, Model, model } from "mongoose";
 import { IProduct } from "@/interfaces";
 
 const productSchema = new Schema({
-    description: { type: String, required: true },
+    description: { type: String, required: true, default: 'New product' },
     images: [{ type: String }],
     inStock: { type: Number, required: true, default: 0 },
     price: { type: Number, required: true, default: 0 },
@@ -15,20 +15,22 @@ const productSchema = new Schema({
     }],
     slug: { type: String, required: true, unique: true },
     tags: [{ type: String }],
-    title: { type: String, required: true },
+    title: { type: String, required: true, default: 'New Product - No name' },
     type: {
         type: String,
         enum: {
             values: ['shirts', 'pants', 'hoodies', 'hats'],
             message: '{VALUE} is not a valid type'
-        }
+        },
+        default: 'shirts'
     },
     gender: {
         type: String,
         enum: {
             values: ['men', 'women', 'kid', 'unisex'],
             message: '{VALUE} is not a valid genre'
-        }
+        },
+        default: 'unisex'
     },
 }, {
     timestamps: true

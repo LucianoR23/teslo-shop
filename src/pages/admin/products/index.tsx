@@ -1,8 +1,8 @@
 import { AdminLayout } from "@/components"
 import { IProduct, IUser } from "@/interfaces";
 import { currency } from "@/utils";
-import { CategoryRounded, ConfirmationNumberRounded } from "@mui/icons-material"
-import { CardMedia, Chip, Grid, Link } from "@mui/material"
+import { AddRounded, CategoryRounded, ConfirmationNumberRounded } from "@mui/icons-material"
+import { Box, Button, CardMedia, Chip, Grid, Link } from "@mui/material"
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import NextLink from "next/link";
 import useSWR from "swr";
@@ -63,6 +63,11 @@ const ProductsAdmin = () => {
 
     return (
         <AdminLayout title={`Products ${ data?.length }`} subtitle='Product maintenance' icon={ <CategoryRounded sx={{ mr: 1 }} /> }>
+            <Box display='flex' justifyContent='end' sx={{ mb: 2 }}>
+                <Button startIcon={ <AddRounded /> } color="secondary" href="/admin/products/new">
+                    Create product
+                </Button>
+            </Box>
             <Grid container className='fadeIn'>
                 <Grid item xs={12} sx={{ height: 650, width: '100%' }}>
                     <DataGrid className="border-line" sx={{ borderRight: '1px solid rgba(0, 0, 0, 0.1)' }} disableRowSelectionOnClick columns={ columns } rows={ rows } autoPageSize /* initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} pageSizeOptions={[10, 20, 30]} */ />
