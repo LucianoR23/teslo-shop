@@ -17,7 +17,7 @@ const columns: GridColDef[] = [
         renderCell: ({ row }: GridRenderCellParams ) => {
             return (
                 <NextLink href={ `/product/${ row.slug }` } prefetch={ false } target="_blank">
-                    <CardMedia component='img' className="fadeIn" image={ `/products/${ row.img }` } alt={ row.title } />
+                    <CardMedia component='img' className="fadeIn" image={ row.img } alt={ row.title } />
                 </NextLink>
             )
         }

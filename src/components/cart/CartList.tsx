@@ -35,7 +35,7 @@ export const CartList = ({ editable = false, products }: Props) => {
                             {/* TODO llevar a la pagfina del producto */}
                             <Link component={ NextLink } href={`/product/${product.slug}`} passHref>
                                 <CardActionArea>
-                                    <CardMedia image={ `/products/${ product.images }` } component='img' sx={{ borderRadius: '5px' }} />
+                                    <CardMedia image={ product.images } component='img' sx={{ borderRadius: '5px' }} />
                                 </CardActionArea>
                             </Link>
                         </Grid>

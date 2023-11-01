@@ -12,10 +12,9 @@ export const Slideshow = ({ images }: Props) => {
         <Slide easing="ease" duration={7000} indicators>
             {
                 images.map( img => {
-                    const url = `/products/${ img }`
                     return (
                         <div className={ styles['each-slide'] } key={ img }>
-                            <Box component='div' style={{ backgroundImage: `url(${ url })`, backgroundSize: 'cover' }}>
+                            <Box component='div' style={{ backgroundImage: `url(${ img })`, backgroundSize: 'cover' }}>
 
                             </Box>
                         </div>

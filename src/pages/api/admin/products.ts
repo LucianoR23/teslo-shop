@@ -1,8 +1,11 @@
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { isValidObjectId } from 'mongoose'
+import { v2 as cloudinary } from 'cloudinary'
 import { db } from '@/database'
 import { IProduct } from '@/interfaces'
 import { Product } from '@/models'
-import { isValidObjectId } from 'mongoose'
-import type { NextApiRequest, NextApiResponse } from 'next'
+
+cloudinary.config( process.env.CLOUDINARY_URL || '' )
 
 type Data = 
 | { message: string }
@@ -22,7 +25,6 @@ export default function handlerProductsAdmin(req: NextApiRequest, res: NextApiRe
             return createProduct( req, res )
         default:
             return res.status(400).json({ message: 'Method does not exist' })
-            
     }
 
 }
@@ -36,8 +38,16 @@ const getProductsSearch = async( req: NextApiRequest, res: NextApiResponse<Data>
     await db.disconnect()
 
     // TODO 
+    const updatedProducts = products.map( product => {
+        product.images = product.images.map( image => {
+            console.log(image)
+            return image.includes('http') ? image : `${process.env.HOST_NAME}/products/${ image }`
+        } )
 
-    return res.status(200).json( products )
+        return product
+    } )
+
+    return res.status(200).json( updatedProducts )
 }
 
 const updateProducts = async( req: NextApiRequest, res: NextApiResponse<Data> ) => {
@@ -62,7 +72,13 @@ const updateProducts = async( req: NextApiRequest, res: NextApiResponse<Data> ) 
             return res.status(400).json({ message: 'Could not find a product with that ID' })
         }
 
-        //TODO eliminar fotos en Cloudinary
+        product.images.forEach( async(image) => {
+            if( !images.includes(image) ){
+                const [ fileId, extension ] = image.substring( image.lastIndexOf('/') + 1 ).split('.')
+                await cloudinary.uploader.destroy( `teslo_shop/${ fileId }` )
+                
+            }
+        } )
 
         await product.updateOne( req.body )
         await db.disconnect()

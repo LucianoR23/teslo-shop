@@ -13,7 +13,9 @@ export const getProductSlug = async( slug: string ): Promise<IProduct | null> =>
         return null
     }
 
-    //TODO: procesamiento de las imagenes
+    product.images = product.images.map( image => {
+        return image.includes('http') ? image : `${process.env.HOST_NAME}/products/${ image }`
+    } )
 
     return JSON.parse( JSON.stringify( product ) )
 
@@ -49,7 +51,16 @@ export const getProductsSearch = async ( term: string): Promise<IProduct[]> => {
     
     await db.disconnect()
 
-    return products
+    const updatedProducts = products.map( product => {
+        product.images = product.images.map( image => {
+            return image.includes('http') ? image : `${process.env.HOST_NAME}/products/${ image }`
+        } )
+
+        return product
+    } )
+
+
+    return updatedProducts
 }
 
 export const getAllProducts = async(): Promise<IProduct[]> => {
@@ -58,5 +69,14 @@ export const getAllProducts = async(): Promise<IProduct[]> => {
     const allProducts = await Product.find().select('title images price inStock slug -_id').lean()
     await db.disconnect()
 
-    return allProducts
+    const updatedProducts = allProducts.map( product => {
+        product.images = product.images.map( image => {
+            return image.includes('http') ? image : `${process.env.HOST_NAME}/products/${ image }`
+        } )
+
+        return product
+    } )
+
+
+    return updatedProducts
 }
