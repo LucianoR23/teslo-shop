@@ -35,10 +35,6 @@ export const AuthProvider = ({ children }: Props) => {
     }, [status, data])
     
 
-    // useEffect(() => {
-    //     checkToken()
-    // }, [])
-
     const checkToken = async() => {
 
         if( !Cookies.get('token') ){ return }

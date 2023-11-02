@@ -53,6 +53,7 @@ const LoginPage = () => {
         // }
 
         // const destination = router.query.p?.toString() || '/'
+        // console.log(destination)
         // router.replace(destination)
     }
 
@@ -150,6 +151,8 @@ const LoginPage = () => {
 
 export const getServerSideProps: GetServerSideProps = async ({ req, query }) => {
     const session = await getSession({ req })
+
+    console.log({session})
 
     const { p = '/' } = query
 

@@ -6,6 +6,7 @@ export async function middleware(req: NextRequest) {
     const validRoles = ['admin', 'super-user']
 
     const session: any = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    console.log({session})
 
     if( req.nextUrl.pathname.startsWith('/api/admin') ){
         if( !session ){
