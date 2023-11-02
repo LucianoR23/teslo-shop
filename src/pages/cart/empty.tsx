@@ -18,7 +18,7 @@ const EmptyPage = () => {
             
         }, 1000);
         
-    }, [])
+    }, [router])
 
     return (
         <ShopLayout title="Empty cart" pageDescription="There are no items in the shopping cart" >

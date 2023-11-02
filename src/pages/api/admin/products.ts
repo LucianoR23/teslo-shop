@@ -40,7 +40,6 @@ const getProductsSearch = async( req: NextApiRequest, res: NextApiResponse<Data>
     // TODO 
     const updatedProducts = products.map( product => {
         product.images = product.images.map( image => {
-            console.log(image)
             return image.includes('http') ? image : `${process.env.HOST_NAME}/products/${ image }`
         } )
 

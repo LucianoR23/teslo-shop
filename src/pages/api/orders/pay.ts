@@ -90,7 +90,6 @@ const payOrder = async( req: NextApiRequest, res: NextApiResponse<Data> ) => {
     dbOrder.transactionId = transactionid
     dbOrder.isPaid = true
     dbOrder.paidAt = data.create_time
-    console.log(data.create_time)
 
     await dbOrder.save()
 
