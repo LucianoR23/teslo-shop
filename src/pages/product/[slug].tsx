@@ -1,11 +1,11 @@
 import { useState, useContext } from 'react';
 import { GetStaticPaths, GetStaticProps } from 'next'
+import { useRouter } from 'next/router';
 import { Box, Button, Chip, Grid, Typography } from "@mui/material"
 import { ItemCounter, ShopLayout, SizeSelector, Slideshow } from "@/components"
 import { ICartProduct, IProduct, ISize } from "@/interfaces";
 import { dbProducts } from '@/database';
 import { CartContext } from '@/context';
-import { useRouter } from 'next/router';
 
 
 interface Props {
